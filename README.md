@@ -109,7 +109,6 @@ docker compose up -d --build   # Caddy otomatis mengaktifkan HTTPS + redirect 80
 Tanpa `SITE_ADDRESS`, Caddy berjalan HTTP biasa di `:80` (cocok untuk lokal).
 Pastikan port 80 dan 443 terbuka di firewall server.
 
-
 ## Struktur
 
 ```text
