@@ -24,53 +24,60 @@
     </nav>
 
     <div class="container">
-      <p class="eyebrow">Sistem Antrean Terdistribusi</p>
-      <h1>Antre layanan kampus tanpa berdiri di lorong.</h1>
-      <p class="lead">
-        Ambil nomor dari mana saja, pantau panggilan secara langsung. Setiap
-        permintaan dilayani oleh salah satu dari tiga node server di belakang
-        load balancer.
-      </p>
-      <span id="served-by" class="served-by hidden mt"></span>
+      <header class="hero">
+        <p class="eyebrow">Sistem Antrean Terdistribusi</p>
+        <h1>Antre layanan kampus tanpa berdiri di lorong.</h1>
+        <p class="lead">
+          Ambil nomor dari mana saja, pantau panggilan secara langsung. Setiap
+          permintaan dilayani oleh salah satu dari tiga node server di belakang
+          load balancer.
+        </p>
+        <div class="row mt">
+          <a class="btn btn-primary" href="/queue.html">Ambil Antrean</a>
+          <a class="btn btn-ghost" href="/status.html">Cek Status</a>
+        </div>
+        <div class="mt-sm">
+          <span id="served-by" class="served-by on-dark hidden" aria-live="polite"></span>
+        </div>
+      </header>
 
       <div class="grid grid-2 mt">
-        <div class="card ticket">
+        <section class="card ticket" aria-label="Nomor sedang dipanggil">
           <div class="sub">Nomor sedang dipanggil</div>
           <div class="num" id="current-number">—</div>
           <div class="sub" id="current-service"></div>
-        </div>
-        <div class="card">
+        </section>
+        <section class="card card-hover" aria-label="Statistik hari ini">
           <h2>Hari ini</h2>
           <div class="grid grid-2">
-            <div class="stat">
+            <div class="stat accent-waiting">
               <div class="num" id="stat-waiting">0</div>
               <div class="label">Menunggu</div>
             </div>
-            <div class="stat">
+            <div class="stat accent-called">
               <div class="num" id="stat-called">0</div>
               <div class="label">Dipanggil</div>
             </div>
-            <div class="stat">
+            <div class="stat accent-completed">
               <div class="num" id="stat-completed">0</div>
               <div class="label">Selesai</div>
             </div>
-            <div class="stat">
+            <div class="stat accent-cancelled">
               <div class="num" id="stat-cancelled">0</div>
               <div class="label">Dibatalkan</div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
 
-      <div class="row mt">
-        <a class="btn btn-primary" href="/queue.html">Ambil Antrean</a>
-        <a class="btn btn-ghost" href="/status.html">Cek Status</a>
-      </div>
-
-      <div class="card mt">
+      <section class="card card-hover mt">
         <h2>Layanan tersedia</h2>
-        <div class="chips" id="services">Memuat…</div>
-      </div>
+        <div class="chips" id="services">
+          <span class="chip skeleton">Memuat layanan</span>
+          <span class="chip skeleton">Memuat layanan</span>
+          <span class="chip skeleton">Memuat</span>
+        </div>
+      </section>
     </div>
 
     <footer>

@@ -24,26 +24,29 @@
     </nav>
 
     <div class="container container-wide">
-      <p class="eyebrow">Bukti Sistem Terdistribusi</p>
-      <h1>Monitoring instance</h1>
-      <p class="lead">
-        Setiap kali halaman ini menghubungi server, load balancer meneruskannya
-        ke salah satu node. Perhatikan badge "Dilayani oleh" berpindah
-        antar-instance.
-      </p>
+      <header class="hero">
+        <p class="eyebrow">Bukti Sistem Terdistribusi</p>
+        <h1>Monitoring cluster</h1>
+        <p class="lead">
+          Setiap kali halaman ini menghubungi server, load balancer
+          meneruskannya ke salah satu node. Perhatikan badge "Dilayani oleh"
+          berpindah antar-instance.
+        </p>
+        <div class="row mt">
+          <span id="served-by" class="served-by on-dark" aria-live="polite"></span>
+          <button class="btn btn-ghost btn-sm" onclick="probe()">
+            Kirim Request Baru
+          </button>
+        </div>
+      </header>
 
-      <div class="row mt">
-        <span id="served-by" class="served-by"></span>
-        <button class="btn btn-ghost btn-sm" onclick="probe()">
-          Kirim Request Baru
-        </button>
+      <div class="grid grid-3 mt" id="nodes">
+        <div class="card empty">Menghubungi node…</div>
       </div>
-
-      <div class="grid grid-3 mt" id="nodes"></div>
 
       <div class="card mt">
         <h2>Log request terbaru (instance aktif)</h2>
-        <div class="log-stream" id="logs">Memuat…</div>
+        <div class="log-stream" id="logs">Memuat log…</div>
       </div>
     </div>
 
@@ -58,15 +61,16 @@
         el.innerHTML = Object.values(seen)
           .map(
             (n) => `
-        <div class="card node-card online">
+        <div class="card node-card card-hover online">
+          <div class="led">Online</div>
           <div class="name">${n.instance}</div>
-          <span class="badge completed">Online</span>
           <div class="node-meta">
-            port ${n.port}<br />
-            host ${n.hostname}<br />
-            pid ${n.pid}<br />
-            hits ${n.hits} · uptime ${n.uptimeSeconds}s
+            port <b>${n.port}</b><br />
+            host <b>${n.hostname}</b><br />
+            pid <b>${n.pid}</b><br />
+            uptime <b>${n.uptimeSeconds}s</b>
           </div>
+          <div class="node-hits">${n.hits}<span>request ditangani</span></div>
         </div>`,
           )
           .join("");

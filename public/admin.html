@@ -25,12 +25,12 @@
     <div class="container" id="login-view" style="max-width: 420px">
       <p class="eyebrow">Area Petugas</p>
       <h1>Login Admin</h1>
-      <div class="card mt">
+      <div class="card card-hover mt">
         <form id="login-form">
           <label for="username">Username</label>
-          <input id="username" required />
+          <input id="username" autocomplete="username" required />
           <label for="password">Password</label>
-          <input id="password" type="password" required />
+          <input id="password" type="password" autocomplete="current-password" required />
           <button class="btn btn-primary btn-block mt" type="submit">
             Masuk
           </button>
@@ -48,23 +48,23 @@
           <p class="eyebrow">Dashboard Petugas</p>
           <h1>Kelola antrean</h1>
         </div>
-        <span id="served-by" class="served-by"></span>
+        <span id="served-by" class="served-by" aria-live="polite"></span>
       </div>
 
       <div class="grid grid-4 mt">
-        <div class="card stat">
+        <div class="card stat accent-waiting">
           <div class="num" id="s-waiting">0</div>
           <div class="label">Menunggu</div>
         </div>
-        <div class="card stat">
+        <div class="card stat accent-called">
           <div class="num" id="s-called">0</div>
           <div class="label">Dipanggil</div>
         </div>
-        <div class="card stat">
+        <div class="card stat accent-completed">
           <div class="num" id="s-completed">0</div>
           <div class="label">Selesai</div>
         </div>
-        <div class="card stat">
+        <div class="card stat accent-cancelled">
           <div class="num" id="s-cancelled">0</div>
           <div class="label">Dibatalkan</div>
         </div>
@@ -77,7 +77,7 @@
             Muat Ulang
           </button>
         </div>
-        <div style="overflow-x: auto">
+        <div class="table-wrap mt-sm">
           <table>
             <thead>
               <tr>
@@ -91,7 +91,7 @@
             </thead>
             <tbody id="queue-rows">
               <tr>
-                <td colspan="6" class="muted">Memuat…</td>
+                <td colspan="6" class="empty">Memuat…</td>
               </tr>
             </tbody>
           </table>

@@ -26,18 +26,19 @@
     <div class="container">
       <p class="eyebrow">Formulir Antrean</p>
       <h1>Ambil nomor antrean</h1>
+      <p class="lead">Isi data singkat lalu dapatkan nomor antrean digital Anda.</p>
 
       <div class="grid grid-2 mt">
-        <div class="card" id="form-card">
-          <form id="queue-form">
+        <div class="card card-hover" id="form-card">
+          <form id="queue-form" novalidate>
             <label for="name">Nama mahasiswa</label>
-            <input id="name" name="name" required />
+            <input id="name" name="name" autocomplete="name" required />
 
             <label for="nim">NIM</label>
-            <input id="nim" name="nim" required />
+            <input id="nim" name="nim" inputmode="numeric" required />
 
             <label for="studyProgram">Program studi</label>
-            <input id="studyProgram" name="studyProgram" />
+            <input id="studyProgram" name="studyProgram" autocomplete="off" />
 
             <label for="serviceId">Jenis layanan</label>
             <select id="serviceId" name="serviceId" required></select>
@@ -48,14 +49,15 @@
           </form>
         </div>
 
-        <div class="card ticket hidden" id="result-card">
+        <div class="card ticket hidden" id="result-card" aria-live="polite">
           <div class="sub">Nomor antrean Anda</div>
           <div class="num" id="result-number">—</div>
           <div class="sub" id="result-service"></div>
-          <div class="mt">
-            <span id="served-by" class="served-by"></span>
+          <hr class="divider" />
+          <div>
+            <span id="served-by" class="served-by on-dark"></span>
           </div>
-          <p class="sub mt" id="result-ahead"></p>
+          <p class="sub mt-sm" id="result-ahead"></p>
           <a class="btn btn-ghost mt" href="/status.html">Pantau Status</a>
         </div>
       </div>

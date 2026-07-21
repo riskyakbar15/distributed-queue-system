@@ -26,24 +26,25 @@
     <div class="container">
       <p class="eyebrow">Pantau Antrean</p>
       <h1>Cek status antrean</h1>
+      <p class="lead">Masukkan nomor antrean untuk melihat posisi Anda secara langsung.</p>
 
-      <div class="card mt">
-        <form id="status-form" class="row" style="align-items: flex-end">
+      <div class="card card-hover mt">
+        <form id="status-form" class="row row-end">
           <div style="flex: 1; min-width: 200px">
             <label for="number">Nomor antrean</label>
-            <input id="number" placeholder="mis. A001" required />
+            <input id="number" placeholder="mis. A001" autocomplete="off" required />
           </div>
-          <button class="btn btn-primary" type="submit">Cek</button>
+          <button class="btn btn-primary" type="submit">Cek Status</button>
         </form>
       </div>
 
-      <div class="card mt hidden" id="result">
+      <div class="card mt hidden" id="result" aria-live="polite">
         <div class="row">
           <div>
             <p class="eyebrow" id="r-service"></p>
             <div
               class="mono"
-              style="font-size: 2.4rem; font-weight: 700"
+              style="font-size: 2.6rem; font-weight: 700; letter-spacing: 2px"
               id="r-number"
             >
               —
@@ -56,7 +57,7 @@
             <div class="num" id="r-ahead">0</div>
             <div class="label">Antrean di depan</div>
           </div>
-          <div class="stat">
+          <div class="stat accent-called">
             <div class="num mono" id="r-current">—</div>
             <div class="label">Sedang dipanggil</div>
           </div>
