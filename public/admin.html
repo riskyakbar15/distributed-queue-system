@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — KampusQueue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a class="brand" href="/"><span class="dot"></span>KampusQueue</a>
+      <div class="nav-links">
+        <a href="/">Beranda</a>
+        <a href="/monitoring.html">Monitoring</a>
+        <a href="#" id="logout-link" class="hidden">Logout</a>
+      </div>
+    </nav>
+
+    <!-- Login -->
+    <div class="container" id="login-view" style="max-width: 420px">
+      <p class="eyebrow">Area Petugas</p>
+      <h1>Login Admin</h1>
+      <div class="card mt">
+        <form id="login-form">
+          <label for="username">Username</label>
+          <input id="username" required />
+          <label for="password">Password</label>
+          <input id="password" type="password" required />
+          <button class="btn btn-primary btn-block mt" type="submit">
+            Masuk
+          </button>
+        </form>
+        <p class="muted mt" style="font-size: 0.8rem">
+          Default: admin / admin123
+        </p>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="container container-wide hidden" id="dash-view">
+      <div class="row">
+        <div>
+          <p class="eyebrow">Dashboard Petugas</p>
+          <h1>Kelola antrean</h1>
+        </div>
+        <span id="served-by" class="served-by"></span>
+      </div>
+
+      <div class="grid grid-4 mt">
+        <div class="card stat">
+          <div class="num" id="s-waiting">0</div>
+          <div class="label">Menunggu</div>
+        </div>
+        <div class="card stat">
+          <div class="num" id="s-called">0</div>
+          <div class="label">Dipanggil</div>
+        </div>
+        <div class="card stat">
+          <div class="num" id="s-completed">0</div>
+          <div class="label">Selesai</div>
+        </div>
+        <div class="card stat">
+          <div class="num" id="s-cancelled">0</div>
+          <div class="label">Dibatalkan</div>
+        </div>
+      </div>
+
+      <div class="card mt">
+        <div class="row">
+          <h2>Daftar Antrean</h2>
+          <button class="btn btn-ghost btn-sm" onclick="loadAll()">
+            Muat Ulang
+          </button>
+        </div>
+        <div style="overflow-x: auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Nomor</th>
+                <th>Nama</th>
+                <th>Layanan</th>
+                <th>Status</th>
+                <th>Diproses oleh</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="queue-rows">
+              <tr>
+                <td colspan="6" class="muted">Memuat…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+      const loginView = document.getElementById("login-view");
+      const dashView = document.getElementById("dash-view");
+      const logoutLink = document.getElementById("logout-link");
+
+      async function checkAuth() {
+        try {
+          const me = await API.get("/api/admin/me");
+          if (me.data) showDashboard();
+        } catch {
+          /* belum login */
+        }
+      }
+
+      function showDashboard() {
+        loginView.classList.add("hidden");
+        dashView.classList.remove("hidden");
+        logoutLink.classList.remove("hidden");
+        loadAll();
+      }
+
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          try {
+            await API.post("/api/admin/login", {
+              username: document.getElementById("username").value,
+              password: document.getElementById("password").value,
+            });
+            showDashboard();
+          } catch (err) {
+            toast(err.message, "error");
+          }
+        });
+
+      logoutLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await API.post("/api/admin/logout");
+        location.reload();
+      });
+
+      async function loadStats() {
+        const res = await API.get("/api/statistics");
+        showServedBy(res.servedBy);
+        document.getElementById("s-waiting").textContent = res.data.waiting;
+        document.getElementById("s-called").textContent = res.data.called;
+        document.getElementById("s-completed").textContent = res.data.completed;
+        document.getElementById("s-cancelled").textContent = res.data.cancelled;
+      }
+
+      async function loadQueues() {
+        const res = await API.get("/api/admin/queues");
+        const rows = res.data
+          .map((q) => {
+            let actions = "";
+            if (q.status === "waiting")
+              actions += `<button class="btn btn-call btn-sm" onclick="act(${q.id},'call')">Panggil</button> `;
+            if (q.status === "called")
+              actions += `<button class="btn btn-finish btn-sm" onclick="act(${q.id},'finish')">Selesai</button> `;
+            if (q.status === "waiting" || q.status === "called")
+              actions += `<button class="btn btn-cancel btn-sm" onclick="act(${q.id},'cancel')">Batal</button>`;
+            return `<tr>
+          <td class="mono">${q.queue_number}</td>
+          <td>${q.name || "-"}</td>
+          <td>${q.service_name}</td>
+          <td>${statusBadge(q.status)}</td>
+          <td class="mono muted">${q.served_by || "-"}</td>
+          <td>${actions || '<span class="muted">—</span>'}</td>
+        </tr>`;
+          })
+          .join("");
+        document.getElementById("queue-rows").innerHTML =
+          rows ||
+          '<tr><td colspan="6" class="muted">Belum ada antrean</td></tr>';
+      }
+
+      function loadAll() {
+        loadStats();
+        loadQueues();
+      }
+
+      window.act = async (id, action) => {
+        try {
+          const res = await API.patch(`/api/admin/queues/${id}/${action}`);
+          toast(res.message, "success");
+          loadAll();
+        } catch (err) {
+          toast(err.message, "error");
+        }
+      };
+
+      checkAuth();
+      connectRealtime(() => {
+        if (!dashView.classList.contains("hidden")) loadAll();
+      });
+    </script>
+  </body>
+</html>

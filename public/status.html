@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cek Status — KampusQueue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a class="brand" href="/"><span class="dot"></span>KampusQueue</a>
+      <div class="nav-links">
+        <a href="/">Beranda</a>
+        <a href="/queue.html">Ambil Antrean</a>
+        <a href="/status.html" class="active">Cek Status</a>
+        <a href="/monitoring.html">Monitoring</a>
+        <a href="/admin.html">Admin</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <p class="eyebrow">Pantau Antrean</p>
+      <h1>Cek status antrean</h1>
+
+      <div class="card mt">
+        <form id="status-form" class="row" style="align-items: flex-end">
+          <div style="flex: 1; min-width: 200px">
+            <label for="number">Nomor antrean</label>
+            <input id="number" placeholder="mis. A001" required />
+          </div>
+          <button class="btn btn-primary" type="submit">Cek</button>
+        </form>
+      </div>
+
+      <div class="card mt hidden" id="result">
+        <div class="row">
+          <div>
+            <p class="eyebrow" id="r-service"></p>
+            <div
+              class="mono"
+              style="font-size: 2.4rem; font-weight: 700"
+              id="r-number"
+            >
+              —
+            </div>
+          </div>
+          <div id="r-status"></div>
+        </div>
+        <div class="grid grid-3 mt">
+          <div class="stat">
+            <div class="num" id="r-ahead">0</div>
+            <div class="label">Antrean di depan</div>
+          </div>
+          <div class="stat">
+            <div class="num mono" id="r-current">—</div>
+            <div class="label">Sedang dipanggil</div>
+          </div>
+          <div class="stat">
+            <div class="label">Diambil</div>
+            <div class="mono" id="r-created" style="font-size: 0.9rem">—</div>
+          </div>
+        </div>
+        <div class="mt row">
+          <span id="served-by" class="served-by"></span>
+          <button class="btn btn-cancel btn-sm" id="cancel-btn">
+            Batalkan Antrean
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+      let currentNumber = null;
+
+      async function check(number) {
+        try {
+          const res = await API.get(
+            `/api/queues/${encodeURIComponent(number)}`,
+          );
+          const q = res.data;
+          currentNumber = q.queueNumber;
+          document.getElementById("r-service").textContent = q.serviceName;
+          document.getElementById("r-number").textContent = q.queueNumber;
+          document.getElementById("r-status").innerHTML = statusBadge(q.status);
+          document.getElementById("r-ahead").textContent = q.ahead;
+          document.getElementById("r-current").textContent =
+            q.currentCalled || "—";
+          document.getElementById("r-created").textContent = new Date(
+            q.createdAt,
+          ).toLocaleString("id-ID");
+          showServedBy(res.servedBy);
+          document.getElementById("cancel-btn").style.display =
+            q.status === "waiting" ? "" : "none";
+          document.getElementById("result").classList.remove("hidden");
+        } catch (err) {
+          toast(err.message, "error");
+        }
+      }
+
+      document.getElementById("status-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        check(document.getElementById("number").value.trim().toUpperCase());
+      });
+
+      document
+        .getElementById("cancel-btn")
+        .addEventListener("click", async () => {
+          if (!currentNumber) return;
+          try {
+            await API.del(`/api/queues/${encodeURIComponent(currentNumber)}`);
+            toast("Antrean dibatalkan", "success");
+            check(currentNumber);
+          } catch (err) {
+            toast(err.message, "error");
+          }
+        });
+
+      // Perbarui otomatis saat ada event realtime.
+      connectRealtime(() => {
+        if (currentNumber) check(currentNumber);
+      });
+    </script>
+  </body>
+</html>

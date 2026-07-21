@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ambil Antrean — KampusQueue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a class="brand" href="/"><span class="dot"></span>KampusQueue</a>
+      <div class="nav-links">
+        <a href="/">Beranda</a>
+        <a href="/queue.html" class="active">Ambil Antrean</a>
+        <a href="/status.html">Cek Status</a>
+        <a href="/monitoring.html">Monitoring</a>
+        <a href="/admin.html">Admin</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <p class="eyebrow">Formulir Antrean</p>
+      <h1>Ambil nomor antrean</h1>
+
+      <div class="grid grid-2 mt">
+        <div class="card" id="form-card">
+          <form id="queue-form">
+            <label for="name">Nama mahasiswa</label>
+            <input id="name" name="name" required />
+
+            <label for="nim">NIM</label>
+            <input id="nim" name="nim" required />
+
+            <label for="studyProgram">Program studi</label>
+            <input id="studyProgram" name="studyProgram" />
+
+            <label for="serviceId">Jenis layanan</label>
+            <select id="serviceId" name="serviceId" required></select>
+
+            <button class="btn btn-primary btn-block mt" type="submit">
+              Ambil Nomor
+            </button>
+          </form>
+        </div>
+
+        <div class="card ticket hidden" id="result-card">
+          <div class="sub">Nomor antrean Anda</div>
+          <div class="num" id="result-number">—</div>
+          <div class="sub" id="result-service"></div>
+          <div class="mt">
+            <span id="served-by" class="served-by"></span>
+          </div>
+          <p class="sub mt" id="result-ahead"></p>
+          <a class="btn btn-ghost mt" href="/status.html">Pantau Status</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+      async function loadServices() {
+        const res = await API.get("/api/services");
+        document.getElementById("serviceId").innerHTML = res.data
+          .map((s) => `<option value="${s.id}">${s.service_name}</option>`)
+          .join("");
+      }
+      loadServices();
+
+      document
+        .getElementById("queue-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const payload = {
+            name: document.getElementById("name").value,
+            nim: document.getElementById("nim").value,
+            studyProgram: document.getElementById("studyProgram").value,
+            serviceId: document.getElementById("serviceId").value,
+          };
+          try {
+            const res = await API.post("/api/queues", payload);
+            const q = res.data;
+            document.getElementById("result-number").textContent =
+              q.queueNumber;
+            document.getElementById("result-ahead").textContent =
+              `Antrean di depan Anda: ${q.ahead}`;
+            showServedBy(q.servedBy);
+            document.getElementById("result-card").classList.remove("hidden");
+            document.getElementById("form-card").classList.add("hidden");
+            toast(`Nomor ${q.queueNumber} berhasil diambil`, "success");
+          } catch (err) {
+            toast(err.message, "error");
+          }
+        });
+    </script>
+  </body>
+</html>
