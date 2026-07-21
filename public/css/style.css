@@ -81,15 +81,16 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 14px 24px;
   background: rgba(7, 27, 48, 0.85);
-  backdrop-filter: saturate(140%) blur(10px);
-  -webkit-backdrop-filter: saturate(140%) blur(10px);
   color: #fff;
   position: sticky;
   top: 0;
   z-index: 20;
   border-bottom: 1px solid rgba(34, 211, 238, 0.18);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  backdrop-filter: saturate(140%) blur(10px);
 }
 .brand {
   font-family: var(--font-display);
@@ -101,6 +102,7 @@ a {
   gap: 11px;
   color: #fff;
   text-decoration: none;
+  flex-shrink: 0;
 }
 .brand .dot {
   width: 11px;
@@ -114,6 +116,12 @@ a {
   display: flex;
   gap: 4px;
   align-items: center;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar {
+  display: none;
 }
 .nav-links a {
   color: #b9c6d6;
@@ -122,6 +130,7 @@ a {
   font-weight: 500;
   padding: 7px 12px;
   border-radius: 8px;
+  white-space: nowrap;
   transition:
     color 0.15s ease,
     background 0.15s ease;
@@ -831,17 +840,66 @@ footer .mono {
   color: var(--muted-2);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .container {
-    padding: 28px 16px 56px;
+    padding: 32px 18px 60px;
   }
   .hero {
-    padding: 32px 22px;
-    border-radius: 18px;
+    padding: 38px 26px;
+  }
+  h1 {
+    font-size: clamp(1.7rem, 6vw, 2.2rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    padding: 12px 16px;
+  }
+  .container {
+    padding: 24px 14px 52px;
+  }
+  .hero {
+    padding: 28px 18px;
+    border-radius: 16px;
   }
   .nav-links a {
     padding: 6px 9px;
     font-size: 0.82rem;
+  }
+  .lead {
+    font-size: 0.98rem;
+  }
+  .card {
+    padding: 18px;
+  }
+  .stat .num {
+    font-size: 2rem;
+  }
+  /* Baris tombol/kontrol menumpuk dan memenuhi lebar pada layar kecil. */
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .row .btn,
+  .row a.btn {
+    width: 100%;
+  }
+  /* Kecualikan navbar & badge agar tetap sebaris. */
+  .navbar {
+    flex-direction: row;
+  }
+  .served-by {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 400px) {
+  .ticket .num {
+    letter-spacing: 3px;
+  }
+  .brand {
+    font-size: 1.05rem;
   }
 }
 
