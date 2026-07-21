@@ -67,9 +67,9 @@ port 80 dan request akan dibagi ke ketiga instance.
 
 ## Menjalankan dengan Docker Compose
 
-Alternatif tercepat: seluruh sistem (PostgreSQL + Redis + 3 instance + Nginx)
-dijalankan dengan satu perintah. Tidak perlu memasang Node, PostgreSQL, Redis,
-atau Nginx secara manual.
+Alternatif tercepat: seluruh sistem (PostgreSQL + Redis + 3 instance + Caddy
+sebagai reverse proxy/load balancer) dijalankan dengan satu perintah. Tidak
+perlu memasang Node, PostgreSQL, Redis, atau proxy secara manual.
 
 ```bash
 docker compose up --build
@@ -89,6 +89,26 @@ docker compose start app2
 # hentikan & bersihkan (termasuk data)
 docker compose down -v
 ```
+
+### HTTPS otomatis (produksi)
+
+Caddy dapat menerbitkan sertifikat Let's Encrypt secara otomatis. Arahkan sebuah
+domain ke IP server, lalu set `SITE_ADDRESS` (dan `ACME_EMAIL` opsional) sebelum
+menjalankan. Cara termudah: buat berkas `.env` di folder proyek.
+
+```bash
+# .env
+SITE_ADDRESS=namamu.duckdns.org
+ACME_EMAIL=email@anda.com
+```
+
+```bash
+docker compose up -d --build   # Caddy otomatis mengaktifkan HTTPS + redirect 80->443
+```
+
+Tanpa `SITE_ADDRESS`, Caddy berjalan HTTP biasa di `:80` (cocok untuk lokal).
+Pastikan port 80 dan 443 terbuka di firewall server.
+
 
 ## Struktur
 

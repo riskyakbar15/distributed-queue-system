@@ -1,0 +1,21 @@
+# ============================================================
+# Caddy: reverse proxy + load balancer + HTTPS otomatis.
+#
+# SITE_ADDRESS menentukan mode:
+#   - tidak di-set   -> ":80"  (HTTP saja, cocok untuk lokal/uji tanpa domain)
+#   - domain (mis. namamu.duckdns.org) -> Caddy otomatis menerbitkan dan
+#     memperpanjang sertifikat Let's Encrypt (HTTPS + redirect 80 ke 443).
+#
+# Caddy menangani WebSocket (Socket.IO) secara transparan tanpa konfigurasi
+# tambahan, dan membagi request ke tiga instance dengan round robin.
+# ============================================================
+
+{
+	email {$ACME_EMAIL:}
+}
+
+{$SITE_ADDRESS::80} {
+	reverse_proxy app1:3000 app2:3000 app3:3000 {
+		lb_policy round_robin
+	}
+}
